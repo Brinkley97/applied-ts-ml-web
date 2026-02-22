@@ -6,3 +6,6 @@ from django.http import HttpResponse
 # when a user to to localhost:8000/home
 def home(request):
     return HttpResponse('<h1>Blog Home</h1>') 
+
+def about(request):
+    return HttpResponse('<h1>About</h1>')
