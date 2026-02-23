@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls), # http://localhost:8000/admin/
     path('feed/', include('feed.urls')), # http://localhost:8000/feed/
     # path('feed/about', include('feed.urls')), # http://localhost:8000/feed/about
 ]
