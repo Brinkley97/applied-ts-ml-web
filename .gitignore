@@ -2,3 +2,5 @@
 /feed/__pycache__
 /feed/migrations/__pycache__
 db.sqlite3
+*.pyc
+/feed/migrations
