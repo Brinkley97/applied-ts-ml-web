@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 from django.views.generic import (
     ListView,
     DetailView,
@@ -23,6 +24,18 @@ class PostListView(ListView):
     context_object_name = 'posts' # same as above
     ordering = ['-date_posted'] # change order; newest first bc of "-" in front
     paginate_by = 7 # number of posts per page and have to open more; http://localhost:8000/?page=7, http://localhost:8000/?page=2, etc
+
+# see all posts from specific user
+class UserPostListView(ListView):
+    model = Post
+    template_name = 'feed/user_posts.html'  # <app>/<model>_<viewtype>.html
+    context_object_name = 'posts'
+    paginate_by = 7
+
+    # if user doesn't exists, 404
+    def get_queryset(self):
+        user = get_object_or_404(User, username=self.kwargs.get('username'))
+        return Post.objects.filter(author=user).order_by('-date_posted')
 
 # single post
 class PostDetailView(DetailView):
@@ -64,7 +77,6 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         if self.request.user == post.author:
             return True
         return False
-
 
 def about(request):
     return render(request, 'feed/about.html', {'title': 'About'})
