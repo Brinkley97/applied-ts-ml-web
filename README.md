@@ -55,3 +55,12 @@ Once the server is running, open your web browser and click these links:
 | **Login** | [http://127.0.0.1:8000/login/](http://127.0.0.1:8000/login/) | Log in to an existing account. |
 | **Profile** | [http://127.0.0.1:8000/profile/](http://127.0.0.1:8000/profile/) | View your user details (must be logged in). |
 | **Admin Panel** | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | The "CEO" backend. Use the superuser account you created in Phase 2. |
+
+## Phase 4: Test Features
+
+1. [ ] Sign in
+2. [ ] Sign out
+3. [ ] User that is signed in can update their post and not anyone else's post
+4. [ ] User that is signed in can delete their post and not anyone else's post
+5. [ ] User that is signed in can update their profile and not anyone else's profile
+6. [ ] Can access database as superuser
