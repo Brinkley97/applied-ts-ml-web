@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 class Post(models.Model):
@@ -11,3 +12,11 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+    
+    def get_absolute_url(self):
+        """Solve:
+        ImproperlyConfigured at /post/new/
+        No URL to redirect to. Either provide a url or define a get_absolute_url method on the Model.
+        """
+        # reverse returns full path as string
+        return reverse('post-detail', kwargs={'pk': self.pk})
