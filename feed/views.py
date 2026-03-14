@@ -22,6 +22,7 @@ class PostListView(ListView):
     template_name = 'feed/home.html'  # <app>/<model>_<viewtype>.html
     context_object_name = 'posts' # same as above
     ordering = ['-date_posted'] # change order; newest first bc of "-" in front
+    paginate_by = 7 # number of posts per page and have to open more; http://localhost:8000/?page=7, http://localhost:8000/?page=2, etc
 
 # single post
 class PostDetailView(DetailView):
