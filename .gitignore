@@ -4,3 +4,5 @@
 db.sqlite3
 *.pyc
 /feed/migrations
+/profile_pics
+/users/migrations
