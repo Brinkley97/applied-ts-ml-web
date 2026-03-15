@@ -113,8 +113,6 @@ git push --all
 ```
 - **Important:** Rename the local folder (or clone directly into the new name) so you don’t end up with a folder called `django-base-setup` for every startup.
 
-### Pushing Updates to a Startup Repo (`dev` branch)
-
 ### Pushing Base Updates (`django-base-setup`) and Pulling Them Into a Startup Repo
 
 #### A) Push your changes to the **base repo** (`django-base-setup/dev`)
@@ -150,6 +148,7 @@ git push -u origin dev
 ```bash
 cd path/to/<startup-repo>
 
+Important: git remote add upstream ... is a one-time setup. If you see an error like *remote upstream already exists**, skip this step and continue.
 # (one-time setup) add the base repo as "upstream"
 git remote add upstream https://github.com/Brinkley97/django-base-setup.git
 
