@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'feed.apps.FeedConfig', # Custom---Feed app
-    'users.apps.UsersConfig', # Custom---User app,
+    'users.apps.UsersConfig', # Custom---User app
+    'ts_dashboard.apps.TsDashboardConfig', # Custom--TS Dashboard app
     'crispy_forms', # Djano--for html and css
     'crispy_bootstrap5' # Djano--for html and css
 ]
