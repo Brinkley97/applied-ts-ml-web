@@ -115,38 +115,73 @@ git push --all
 
 ### Pushing Updates to a Startup Repo (`dev` branch)
 
-#### Terminal (Recommended)
+### Pushing Base Updates (`django-base-setup`) and Pulling Them Into a Startup Repo
+
+#### A) Push your changes to the **base repo** (`django-base-setup/dev`)
+
+##### Terminal (Recommended)
 ```bash
-# Make sure you’re in the startup repo folder
-cd path/to/<startup-repo>
-
-# Create (or switch to) the dev branch locally
-git checkout -b dev        # use this if dev does NOT exist yet
-# or
-git checkout dev           # use this if dev already exists
-
-# Stage and commit your changes
+cd path/to/django-base-setup
+git checkout dev
 git add .
 git commit -m "Update README"
-
-# Push the dev branch to GitHub
 git push -u origin dev
 ```
 
-#### GitHub Desktop (No Terminal)
+##### GitHub Desktop (No Terminal)
 ```bash
 # 1) Open GitHub Desktop
-# 2) Select the repository from the top-left dropdown (e.g., applied-ts-ml-web)
-# 3) Create or switch to the dev branch:
-#    - Click "Current Branch" (top bar)
-#    - If dev exists, select "dev"
-#    - If dev does not exist, click "New Branch", name it "dev", and create it
+# 2) Select the repository: django-base-setup
+# 3) Switch to the dev branch:
+#    - Click "Current Branch" and select "dev"
+#    - If dev doesn't exist: click "New Branch", name it "dev", create it
 # 4) Make edits in VS Code and save files
-# 5) Return to GitHub Desktop:
-#    - You will see changed files listed
-#    - Write a short commit message (example: "Update README")
+# 5) Back in GitHub Desktop:
+#    - Enter a commit message (example: "Update README")
 #    - Click "Commit to dev"
-# 6) Click "Push origin" (top bar) to push the dev branch to GitHub
+# 6) Click "Push origin" to push django-base-setup/dev to GitHub
+```
+
+---
+
+#### B) Pull base changes into the **startup repo** (`startup/dev`) and push
+
+##### Terminal (Recommended)
+```bash
+cd path/to/<startup-repo>
+
+# (one-time setup) add the base repo as "upstream"
+git remote add upstream https://github.com/Brinkley97/django-base-setup.git
+
+# fetch the latest updates from the base repo
+git fetch upstream
+
+# merge base changes into your startup dev branch
+git checkout dev
+git merge upstream/main
+# or, if you specifically want the base dev branch:
+# git merge upstream/dev
+
+# push the updated startup dev branch
+git push -u origin dev
+```
+
+##### GitHub Desktop (No Terminal)
+```bash
+# Note: GitHub Desktop does NOT have a clean "add upstream remote + merge upstream branch"
+# workflow built into the UI. The simplest approach is:
+#
+# 1) Use Terminal just for the upstream merge step (above), OR
+# 2) Open the startup repo on GitHub.com and manually apply changes (not recommended).
+#
+# Recommended: do the upstream merge in Terminal, then use GitHub Desktop to commit/push.
+#
+# After running the terminal merge:
+# 1) Open GitHub Desktop
+# 2) Select the startup repo (e.g., applied-ts-ml-web)
+# 3) Ensure you are on the dev branch
+# 4) You should see the merged changes listed
+# 5) Click "Push origin" (if not already pushed)
 ```
 
 ### `startup[i]` (Each Startup Repository)
