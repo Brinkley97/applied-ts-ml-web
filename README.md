@@ -32,37 +32,44 @@ source .venv/bin/activate
 # Windows: .venv\Scripts\activate
 
 # Install Django and environment variables
-uv pip install django django-crispy-forms crispy-bootstrap5
+uv pip install django django-crispy-forms crispy-bootstrap5 dotenv
 uv pip compile pyproject.toml -o requirements.txt
 ```
 
 ## Phase 2 (Database & Admin Setup — do this once): 
 
-First, build the database by running `python manage.py migrate`. 
-Next, create an admin account by running `python manage.py createsuperuser`, then follow the prompts to enter a username (for example, admin), email, and password. Note: your password will not visibly appear while you type—this is normal.
+First, build the database by running `python manage.py makemigrations`, then `python manage.py migrate` (this applies migrations for all apps, including users, feed, etc.). If you want to generate migrations for a specific app only, you can run `python manage.py makemigrations users` (or replace users with the app name). Next, create an admin account by running `python manage.py createsuperuser`, then follow the prompts to enter a username (for example, admin), email, and password. Note: your password will not visibly appear while you type—this is normal.
 
 ## Phase 3 (Running the Website — do this every time): 
 
 Whenever you want to work on the site or show it to someone, start the server `python manage.py runserver` and then open the site in your browser.
 
-### 1. View the Site
-Once the server is running, open your web browser and click these links:
+### View the Site + Test Features
+
+Once the server is running, open your web browser and use the links below.
+
 | Page | URL | Description |
 | :--- | :--- | :--- |
-| **Home / Feed** | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | The main landing page. |
-| **Register** | [http://127.0.0.1:8000/register/](http://127.0.0.1:8000/register/) | Create a new generic user account. |
+| **Admin Panel** | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | Admin backend. Use the superuser account. |
+| **Home / Feed** | [http://127.0.0.1:8000/](http://127.0.0.1:8000/) | Main landing page (feed). |
+| **Register** | [http://127.0.0.1:8000/register/](http://127.0.0.1:8000/register/) | Create a new user account. |
 | **Login** | [http://127.0.0.1:8000/login/](http://127.0.0.1:8000/login/) | Log in to an existing account. |
-| **Profile** | [http://127.0.0.1:8000/profile/](http://127.0.0.1:8000/profile/) | View your user details (must be logged in). |
-| **Admin Panel** | [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/) | The "CEO" backend. Use the superuser account you created in Phase 2. |
+| **Logout** | [http://127.0.0.1:8000/logout/](http://127.0.0.1:8000/logout/) | Log out (note: may require clicking the Logout button since Django 5+ uses POST). |
+| **Profile** | [http://127.0.0.1:8000/profile/](http://127.0.0.1:8000/profile/) | View/update your profile (must be logged in). |
+| **Password Reset (Request)** | [http://127.0.0.1:8000/password-reset/](http://127.0.0.1:8000/password-reset/) | Start password reset (sends reset email or prints to console depending on settings). |
+| **Create Post** | *(Usually from the UI)* | Create a new post from the form/button on the feed page (if implemented). |
+| **Update Post** | `http://127.0.0.1:8000/post/<id>/update/` | Edit a specific post (replace `<id>` with a real post id). |
+| **Delete Post** | `http://127.0.0.1:8000/post/<id>/delete/` | Delete a specific post (replace `<id>` with a real post id). |
 
-## Phase 4: Test Features
-
+#### Phase 4: Test Features Checklist
 - [ ] Sign in
 - [ ] Sign out
+- [ ] Create a post (if available in the UI)
 - [ ] User that is signed in can update their post and not anyone else's post
 - [ ] User that is signed in can delete their post and not anyone else's post
 - [ ] User that is signed in can update their profile and not anyone else's profile
-- [ ] Can access database as superuser
+- [ ] Request a password reset email
+- [ ] Can access database as superuser (Admin Panel)
 
 ## Phase 5: Git Workflow (Base Repo + Startups)
 
