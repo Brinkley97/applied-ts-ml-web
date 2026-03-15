@@ -1,0 +1,64 @@
+{% extends "feed/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container my-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="h3 mb-0">Dashboard</h1>
+      <div class="text-muted">Symbol: <strong>{{ symbol }}</strong></div>
+    </div>
+    <div class="text-muted small">Auto-generated chart + stats</div>
+  </div>
+
+  <div class="row g-4">
+    <!-- LEFT: Chart -->
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Time Series</strong>
+        </div>
+        <div class="card-body">
+          <img class="img-fluid rounded"
+               src="{% static chart_path %}"
+               alt="Stock chart for {{ symbol }}">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Stats -->
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Summary Stats</strong>
+        </div>
+
+        <div class="card-body p-0">
+          {% if stats %}
+            <table class="table table-sm mb-0">
+              <tbody>
+                {% for key, value in stats.items %}
+                  <tr>
+                    <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
+                    <td class="pe-3 text-end">
+                      {{ value }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="p-3 text-muted">No stats available.</div>
+          {% endif %}
+        </div>
+
+        <div class="card-footer bg-white text-muted small">
+          Tip: use <code>1d</code> frequency if hourly data is slow or empty.
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock content %}
