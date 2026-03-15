@@ -64,3 +64,43 @@ Once the server is running, open your web browser and click these links:
 4. [ ] User that is signed in can delete their post and not anyone else's post
 5. [ ] User that is signed in can update their profile and not anyone else's profile
 6. [ ] Can access database as superuser
+
+## Phase 5: Git Workflow (Base Repo + Startups)
+
+### `django-base-setup` (The Base Repository)
+
+- **`main`**
+  - Canonical shared base (tutorial + your universal additions)
+  - This is the branch that all startup projects should sync from
+
+- **`tutorial`**
+  - Tutorial-only snapshot/reference branch
+  - Only update this branch when you are strictly following the tutorial
+
+- **`dev`**
+  - Where you build and test new base features first
+  - When a base feature is stable, merge **`dev → main`**
+
+- **Feature branches (optional)**
+  - Create a branch off `dev` for a specific change (example: `feature/navbar`)
+  - Merge **`feature → dev → main`**
+
+
+### `startup[i]` (Each Startup Repository)
+
+- **Initial setup**
+  - Fork (or create a new repo based on) `django-base-setup/main`
+
+- **Internal workflow**
+  - Use a normal `main` + `dev` workflow inside the startup repo
+  - Do active work in `startup[i]/dev`
+  - Merge completed work **`startup[i]/dev → startup[i]/main`**
+
+- **Feature branches (recommended)**
+  - Create a branch for each task (example: `startup[i]/feature/signup-ui`)
+  - Merge **`startup[i]/feature → startup[i]/dev → startup[i]/main`**
+
+- **Receiving updates from the base repo**
+  - Periodically merge updates from **`django-base-setup/main`** into **`startup[i]/dev`**
+  - Test the startup after pulling base updates
+  - Then merge **`startup[i]/dev → startup[i]/main`**
