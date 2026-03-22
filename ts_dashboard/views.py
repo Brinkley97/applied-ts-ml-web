@@ -1,69 +1,78 @@
-# ts_dashboard/views.py
+# AFTER: same URL (/dashboard_home/) every time, but reads query params from the URL
+# Example URL:
+# /dashboard_home/?symbol=MSFT&start_date=2026-03-05&end_date=2026-03-10&forecast=24
+
 from django.shortcuts import render
+from django.http import HttpResponseBadRequest
 from django.conf import settings
 import os
-
 import matplotlib
-matplotlib.use("Agg")  # important for servers (no GUI)
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from collections import namedtuple
 from tslearn.data_loader import build_stock_uts
-from tslearn.time_series import TimeSeriesFactory
+
+ALLOWED_SYMBOLS = {"MSFT": "Microsoft", "INTC": "Intel", "AAPL": "Apple"}
 
 def home(request):
-    """
-    notebook: framework_for_time_series_data/nlp_ts/paper-daily-sse_stock-ts_models.ipynb
-    
-    """
-    start_date, end_date = "2025-11-10", "2026-11-10"
-    Stock = namedtuple("Stock", ["symbol", "name"])
+    # Defaults (used when query params are missing)
+    symbol = request.GET.get("symbol", "MSFT").upper()
+    start_date = request.GET.get("start_date", "2026-03-05")
+    end_date = request.GET.get("end_date", "2026-03-10")
+    forecast_raw = request.GET.get("forecast", "24")
 
-    stocks = [
-        Stock("MSFT", "Microsoft"),
-        Stock("INTC", "Intel"),
-    ]
+    # Validate
+    if symbol not in ALLOWED_SYMBOLS:
+        return HttpResponseBadRequest("Invalid symbol.")
 
-    independent_variable = "Close"
+    try:
+        forecast_steps = int(forecast_raw)
+        if forecast_steps < 1:
+            raise ValueError
+    except ValueError:
+        return HttpResponseBadRequest("Forecast must be a positive integer.")
 
-    stocks = {
-        s.symbol: build_stock_uts(
-            s.symbol,
-            s.name,
-            independent_variable,
-            start_date=start_date,
-            end_date=end_date,
-            frequency="1h",
-        )
-        for s in stocks
-    }
+    if not start_date or not end_date or end_date <= start_date:
+        return HttpResponseBadRequest("End date must be after start date.")
 
-    stock_symbol = "MSFT"
-    stock_of_interest = stocks[stock_symbol]
-    stock_df = stock_of_interest.get_as_df()  # must include time + Close
+    metric = "Close"
+    frequency = "1h"
 
-    # ---- make a chart image and save it into static ----
+    ts = build_stock_uts(
+        symbol,
+        ALLOWED_SYMBOLS[symbol],
+        metric,
+        start_date=start_date,
+        end_date=end_date,
+        frequency=frequency,
+    )
+    df = ts.get_as_df()
+
+    # Save chart (still PNG for now)
     plt.figure(figsize=(10, 4))
-    plt.plot(stock_df.index, stock_df[independent_variable])
-    plt.title(f"{stock_symbol} ({independent_variable})")
-    plt.xlabel("Date")
-    plt.ylabel(independent_variable)
+    plt.plot(df.index, df[metric])
+    plt.title(f"{symbol} ({metric})")
     plt.tight_layout()
 
     out_dir = os.path.join(settings.BASE_DIR, "ts_dashboard", "static", "ts_dashboard")
     os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, "msft.png")
+    filename = f"{symbol.lower()}.png"
+    out_path = os.path.join(out_dir, filename)
     plt.savefig(out_path, dpi=150)
     plt.close()
 
-    time_type = 'hours'
-    stock_data = True
+    stats = ts.get_statistics(time_type="hours", type_of_data=metric)
 
-    get_stats = stock_of_interest.get_statistics(time_type, stock_data)
+    context = {
+        "chart_path": f"ts_dashboard/{filename}",
+        "symbol": symbol,
+        "stats": stats,
+        "forecast_steps": forecast_steps,
 
-    # give template the static path
-    context = {"chart_path": "ts_dashboard/msft.png", 
-               "symbol": stock_symbol,
-               "stats": get_stats
-               }
+        # send back form values so the form stays filled in
+        "form_symbol": symbol,
+        "form_start_date": start_date,
+        "form_end_date": end_date,
+        "form_forecast": forecast_steps,
+    }
     return render(request, "ts_dashboard/base.html", context)
