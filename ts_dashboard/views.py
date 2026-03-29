@@ -63,13 +63,19 @@ def home(request):
 
     stats = ts.get_statistics(time_type="hours", type_of_data=metric)
 
+    action = request.GET.get("action", "")
+    stationarity = None
+    if action == "stationarity":
+        series = ts.get_series()
+        stationarity = ts.stationarity_test(series)
+
     context = {
-        "chart_path": f"ts_dashboard/{filename}",
+        "chart_url": f"{settings.STATIC_URL}ts_dashboard/{filename}",
+        "forecast_chart_url": None,  # placeholder until forecast is implemented
         "symbol": symbol,
         "stats": stats,
+        "stationarity": stationarity,
         "forecast_steps": forecast_steps,
-
-        # send back form values so the form stays filled in
         "form_symbol": symbol,
         "form_start_date": start_date,
         "form_end_date": end_date,

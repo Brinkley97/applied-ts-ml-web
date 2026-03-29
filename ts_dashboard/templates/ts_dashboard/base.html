@@ -3,37 +3,58 @@
 
 {% block content %}
 <div class="container my-4">
-  <form method="get" action="{% url 'dashboard-home' %}" class="row g-3 align-items-end">
-  <!-- <form method="get" action="" class="row g-3 align-items-end"> -->
+
+  <!-- FORM -->
+  <form method="get" action="{% url 'dashboard-home' %}" class="row g-3 align-items-end mb-4">
+
     <div class="col-12 col-md-3">
       <label class="form-label">Stock</label>
       <select name="symbol" class="form-select">
-        <option value="MSFT">Microsoft (MSFT)</option>
-        <option value="INTC">Intel (INTC)</option>
-        <option value="AAPL">Apple (AAPL)</option>
+        <option value="MSFT" {% if form_symbol == "MSFT" %}selected{% endif %}>Microsoft (MSFT)</option>
+        <option value="INTC" {% if form_symbol == "INTC" %}selected{% endif %}>Intel (INTC)</option>
+        <option value="AAPL" {% if form_symbol == "AAPL" %}selected{% endif %}>Apple (AAPL)</option>
       </select>
     </div>
 
     <div class="col-12 col-md-3">
       <label class="form-label">Start date</label>
-      <input type="date" name="start_date" class="form-control">
+      <input type="date" name="start_date" class="form-control" value="{{ form_start_date }}">
     </div>
 
     <div class="col-12 col-md-3">
       <label class="form-label">End date</label>
-      <input type="date" name="end_date" class="form-control">
+      <input type="date" name="end_date" class="form-control" value="{{ form_end_date }}">
     </div>
 
     <div class="col-12 col-md-2">
       <label class="form-label">Forecast (steps)</label>
-      <input type="number" name="forecast" class="form-control" min="1" value="24">
+      <input type="number" name="forecast" class="form-control" min="1" value="{{ form_forecast }}">
     </div>
+
+    <!-- hidden action field -->
+    <input type="hidden" name="action" id="action-input" value="">
 
     <div class="col-12 col-md-1 d-grid">
-      <button class="btn btn-primary" type="submit">Run</button>
+      <button
+        class="btn btn-primary"
+        type="submit"
+        onclick="document.getElementById('action-input').value=''">
+        Run
+      </button>
     </div>
+
+    <div class="col-12 col-md-2 d-grid">
+      <button
+        class="btn btn-outline-secondary"
+        type="submit"
+        onclick="document.getElementById('action-input').value='stationarity'">
+        Run Stationarity
+      </button>
+    </div>
+
   </form>
 
+  <!-- HEADER -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
       <h1 class="h3 mb-0">Forecast Dashboard</h1>
@@ -42,39 +63,42 @@
     <div class="text-muted small">Auto-generated chart + stats</div>
   </div>
 
+  <!-- ROW 1: Original chart + Stats -->
   <div class="row g-4">
-    <!-- LEFT: Chart -->
+
+    <!-- LEFT: Original chart -->
     <div class="col-12 col-lg-8">
       <div class="card shadow-sm">
         <div class="card-header bg-white">
-          <strong>Time Series</strong>
+          <strong>Original (No Forecast)</strong>
         </div>
         <div class="card-body">
-          <img class="img-fluid rounded"
-               src="{% static chart_path %}"
-               alt="Stock chart for {{ symbol }}">
+          {% if chart_url %}
+            <img class="img-fluid rounded" src="{{ chart_url }}" alt="Stock chart for {{ symbol }}">
+          {% else %}
+            <div class="text-muted p-3">No chart available. Click Run.</div>
+          {% endif %}
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: Stats -->
+    <!-- RIGHT: Stats + Stationarity -->
     <div class="col-12 col-lg-4">
-      <div class="card shadow-sm">
+
+      <!-- Stats card -->
+      <div class="card shadow-sm mb-3">
         <div class="card-header bg-white">
           <strong>Summary Stats</strong>
         </div>
-
         <div class="card-body p-0">
           {% if stats %}
             <table class="table table-sm mb-0">
               <tbody>
                 {% for key, value in stats.items %}
-                  <tr>
-                    <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                    <td class="pe-3 text-end">
-                      {{ value }}
-                    </td>
-                  </tr>
+                <tr>
+                  <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
+                  <td class="pe-3 text-end">{{ value  }}</td>
+                </tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -82,9 +106,48 @@
             <div class="p-3 text-muted">No stats available.</div>
           {% endif %}
         </div>
-
         <div class="card-footer bg-white text-muted small">
           Tip: use <code>1d</code> frequency if hourly data is slow or empty.
+        </div>
+      </div>
+
+      <!-- Stationarity card (only shown after clicking Run Stationarity) -->
+      {% if stationarity %}
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Stationarity Test (ADF)</strong>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <tbody>
+              {% for key, value in stationarity.items %}
+              <tr>
+                <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
+                <td class="pe-3 text-end">{{ value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- ROW 2: Forecast chart -->
+  <div class="row g-4 mt-2">
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Forecast</strong>
+        </div>
+        <div class="card-body">
+          {% if forecast_chart_url %}
+            <img class="img-fluid rounded" src="{{ forecast_chart_url }}" alt="Forecast chart for {{ symbol }}">
+          {% else %}
+            <div class="text-muted p-3">Forecast chart not yet available.</div>
+          {% endif %}
         </div>
       </div>
     </div>
