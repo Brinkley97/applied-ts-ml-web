@@ -39,12 +39,13 @@
       </button>
     </div>
     <div class="col-12 col-md-2 d-grid">
-      <button class="btn btn-success" type="submit"
-        onclick="document.getElementById('action-input').value='forecast'">
+      <button
+        class="btn btn-success"
+        type="submit"
+        formaction="{% url 'dashboard-forecast' %}">
         Run Forecast
       </button>
     </div>
-  </form>
 
   <!-- HEADER -->
   <div class="d-flex justify-content-between align-items-center mb-3">
@@ -58,89 +59,20 @@
   <!-- MAIN ROW: 3 - 6 - 3 -->
   <div class="row g-3">
 
-    <!-- LEFT (3/12): News Articles -->
+    <!-- LEFT (3/12): Relevant Material: News API + YT + etc based on stock, date -->
     <div class="col-lg-3">
       <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white"><strong>Summary Stats</strong></div>
+        <div class="card-header bg-white"><strong>Relevant Material</strong></div>
         <div class="card-body p-0">
-          {% if stats %}
-            <table class="table table-sm mb-0">
-              <tbody>
-                {% for key, value in stats.items %}
-                <tr>
-                  <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                  <td class="pe-3 text-end">{{ value }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <div class="p-3 text-muted">No stats available. Click Run.</div>
-          {% endif %}
-        </div>
-        <div class="card-footer bg-white text-muted small">
-          Tip: use <code>1d</code> frequency if hourly data is slow or empty.
+          <ul>
+            <li><a href="https://www.google.com" target="_blank">Google</a></li>
+            <li><a href="https://www.wikipedia.org" target="_blank">Wikipedia</a></li>
+            <li><a href="https://www.github.com" target="_blank">GitHub</a></li>
+            <li><a href="https://www.stackoverflow.com" target="_blank">Stack Overflow</a></li>
+          </ul>
         </div>
       </div>
-    </div>
-
-    <!-- MIDDLE (6/12): Charts -->
-    <div class="col-lg-6">
-
-      <!-- Original chart -->
-      <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white"><strong>Original (No Forecast)</strong></div>
-        <div class="card-body">
-          {% if chart_url %}
-            <img class="img-fluid rounded" src="{{ chart_url }}" alt="Stock chart for {{ symbol }}">
-          {% else %}
-            <div class="text-muted p-3">No chart available. Click Run.</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <!-- Forecast chart -->
-      <div class="card shadow-sm">
-        <div class="card-header bg-white"><strong>Forecast (Random Walk)</strong></div>
-        <div class="card-body">
-          {% if forecast_chart_url %}
-            <img class="img-fluid rounded" src="{{ forecast_chart_url }}" alt="Forecast chart for {{ symbol }}">
-          {% else %}
-            <div class="text-muted p-3">Click "Run Forecast" to generate a forecast.</div>
-          {% endif %}
-        </div>
-      </div>
-
-    </div>
-
-    <!-- RIGHT (3/12): Stationarity + Forecast Metrics -->
-    <div class="col-lg-3">
-      <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white"><strong>Summary Stats</strong></div>
-        <div class="card-body p-0">
-          {% if stats %}
-            <table class="table table-sm mb-0">
-              <tbody>
-                {% for key, value in stats.items %}
-                <tr>
-                  <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                  <td class="pe-3 text-end">{{ value }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <div class="p-3 text-muted">No stats available. Click Run.</div>
-          {% endif %}
-        </div>
-        <div class="card-footer bg-white text-muted small">
-          Tip: use <code>1d</code> frequency if hourly data is slow or empty.
-        </div>
-      </div>
-    </div>
-    
-    <div class="col-lg-3">
-
+                
       <!-- Stationarity card -->
       {% if stationarity %}
       <div class="card shadow-sm mb-3">
@@ -164,33 +96,50 @@
         <div class="card-body text-muted p-3">Click "Run Stationarity" to test.</div>
       </div>
       {% endif %}
-
-      <!-- Forecast metrics card -->
-      {% if forecast_metrics %}
-      <div class="card shadow-sm">
-        <div class="card-header bg-white"><strong>Forecast Metrics</strong></div>
-        <div class="card-body p-0">
-          <table class="table table-sm mb-0">
-            <tbody>
-              {% for key, value in forecast_metrics.items %}
-              <tr>
-                <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                <td class="pe-3 text-end">{{ value }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {% else %}
-      <div class="card shadow-sm">
-        <div class="card-header bg-white"><strong>Forecast Metrics</strong></div>
-        <div class="card-body text-muted p-3">Click "Run Forecast" to see metrics.</div>
-      </div>
-      {% endif %}
-
+    
     </div>
 
+    <!-- MIDDLE (6/12): Charts -->
+    <div class="col-lg-6">
+
+      <!-- Original chart -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>Original (No Forecast)</strong></div>
+        <div class="card-body">
+          {% if chart_url %}
+            <img class="img-fluid rounded" src="{{ chart_url }}" alt="Stock chart for {{ symbol }}">
+          {% else %}
+            <div class="text-muted p-3">No chart available. Click Run.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT (3/12): Summary -->
+    <div class="col-lg-3">
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>Summary Stats</strong></div>
+        <div class="card-body p-0">
+          {% if stats %}
+            <table class="table table-sm mb-0">
+              <tbody>
+                {% for key, value in stats.items %}
+                <tr>
+                  <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
+                  <td class="pe-3 text-end">{{ value }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="p-3 text-muted">No stats available. Click Run.</div>
+          {% endif %}
+        </div>
+        <div class="card-footer bg-white text-muted small">
+          Tip: use <code>1d</code> frequency if hourly data is slow or empty.
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock content %}
