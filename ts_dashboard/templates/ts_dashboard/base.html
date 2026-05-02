@@ -1,189 +1,82 @@
-{% extends "feed/base.html" %}
 {% load static %}
-{% block content %}
-<div class="container my-4">
+<!DOCTYPE html>
+<html>
+<head>
 
-  <!-- FORM -->
-  <form method="get" action="{% url 'dashboard-home' %}" class="row g-3 align-items-end mb-4">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <div class="col-12 col-md-3">
-      <label class="form-label">Stock</label>
-      <select name="symbol" class="form-select">
-        <option value="MSFT" {% if form_symbol == "MSFT" %}selected{% endif %}>Microsoft (MSFT)</option>
-        <option value="INTC" {% if form_symbol == "INTC" %}selected{% endif %}>Intel (INTC)</option>
-        <option value="AAPL" {% if form_symbol == "AAPL" %}selected{% endif %}>Apple (AAPL)</option>
-      </select>
-    </div>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <div class="col-12 col-md-3">
-      <label class="form-label">Start date</label>
-      <input type="date" name="start_date" class="form-control" value="{{ form_start_date }}">
-    </div>
+    <link rel="stylesheet" type="text/css" href="{% static 'ts_dashboard/main.css' %}">
 
-    <div class="col-12 col-md-3">
-      <label class="form-label">End date</label>
-      <input type="date" name="end_date" class="form-control" value="{{ form_end_date }}">
-    </div>
+    {% if title %}
+        <title>Django feed - {{ title }}</title>
+    {% else %}
+        <title>Django feed</title>
+    {% endif %}
+</head>
+<body>
+    <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+          <a class="navbar-brand mr-4" href="{% url 'feed-home' %}">Django feed</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+              <a class="nav-item nav-link" href="{% url 'feed-home' %}">Home</a>
+              <a class="nav-item nav-link" href="{% url 'feed-about' %}">About</a>
+              <a class="nav-item nav-link" href="{% url 'dashboard-home' %}">Forecast Dashboard</a>
+            </div>
+            <!-- Navbar Right Side -->
+            <div class="navbar-nav">
+              {% if user.is_authenticated %}
+                <a class="nav-item nav-link" href="{% url 'post-create' %}">New Post</a>
+                <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
+                <!-- OLD WAY (Broken in Django 5) -->
+                <!-- <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a> -->
 
-    <div class="col-12 col-md-2">
-      <label class="form-label">Forecast (steps)</label>
-      <input type="number" name="forecast" class="form-control" min="1" value="{{ form_forecast }}">
-    </div>
-
-    <!-- hidden action field -->
-    <input type="hidden" name="action" id="action-input" value="">
-
-    <!-- Run (chart + stats only) -->
-    <div class="col-12 col-md-1 d-grid">
-      <button
-        class="btn btn-primary"
-        type="submit"
-        onclick="document.getElementById('action-input').value=''">
-        Run
-      </button>
-    </div>
-
-    <!-- Run Stationarity -->
-    <div class="col-12 col-md-2 d-grid">
-      <button
-        class="btn btn-outline-secondary"
-        type="submit"
-        onclick="document.getElementById('action-input').value='stationarity'">
-        Run Stationarity
-      </button>
-    </div>
-
-    <!-- Run Forecast -->
-    <div class="col-12 col-md-2 d-grid">
-      <button
-        class="btn btn-success"
-        type="submit"
-        onclick="document.getElementById('action-input').value='forecast'">
-        Run Forecast
-      </button>
-    </div>
-
-  </form>
-
-  <!-- HEADER -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h1 class="h3 mb-0">Forecast Dashboard</h1>
-      <div class="text-muted">Symbol: <strong>{{ symbol }}</strong></div>
-    </div>
-    <div class="text-muted small">Auto-generated chart + stats</div>
-  </div>
-
-  <!-- ROW 1: Original chart + Stats -->
-  <div class="row g-4">
-
-    <!-- LEFT: Original chart -->
-    <div class="col-12 col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <strong>Original (No Forecast)</strong>
+                <!-- NEW WAY (Correct) -->
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-item nav-link btn btn-link" style="display: inline; border: none; background: none;">Logout</button>
+                </form>
+              {% else %}
+                <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
+                <a class="nav-item nav-link" href="{% url 'register' %}">Register</a>
+              {% endif %}
+            </div>
+          </div>
         </div>
-        <div class="card-body">
-          {% if chart_url %}
-            <img class="img-fluid rounded" src="{{ chart_url }}" alt="Stock chart for {{ symbol }}">
-          {% else %}
-            <div class="text-muted p-3">No chart available. Click Run.</div>
-          {% endif %}
-        </div>
-      </div>
+      </nav>
+    </header>
+    
+    
+    <div class="col-lg-12">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
     </div>
+ 
+    
 
-    <!-- RIGHT: Stats + Stationarity -->
-    <div class="col-12 col-lg-4">
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
-      <!-- Stats card -->
-      <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white">
-          <strong>Summary Stats</strong>
-        </div>
-        <div class="card-body p-0">
-          {% if stats %}
-            <table class="table table-sm mb-0">
-              <tbody>
-                {% for key, value in stats.items %}
-                <tr>
-                  <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                  <td class="pe-3 text-end">{{ value }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <div class="p-3 text-muted">No stats available.</div>
-          {% endif %}
-        </div>
-        <div class="card-footer bg-white text-muted small">
-          Tip: use <code>1d</code> frequency if hourly data is slow or empty.
-        </div>
-      </div>
 
-      <!-- Stationarity card -->
-      {% if stationarity %}
-      <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white">
-          <strong>Stationarity Test (ADF)</strong>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-sm mb-0">
-            <tbody>
-              {% for key, value in stationarity.items %}
-              <tr>
-                <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                <td class="pe-3 text-end">{{ value }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {% endif %}
-
-      <!-- Forecast metrics card -->
-      {% if forecast_metrics %}
-      <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <strong>Forecast Metrics</strong>
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-sm mb-0">
-            <tbody>
-              {% for key, value in forecast_metrics.items %}
-              <tr>
-                <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                <td class="pe-3 text-end">{{ value }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {% endif %}
-
-    </div>
-  </div>
-
-  <!-- ROW 2: Forecast chart -->
-  <div class="row g-4 mt-2">
-    <div class="col-12 col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-header bg-white">
-          <strong>Forecast (Random Walk)</strong>
-        </div>
-        <div class="card-body">
-          {% if forecast_chart_url %}
-            <img class="img-fluid rounded" src="{{ forecast_chart_url }}" alt="Forecast chart for {{ symbol }}">
-          {% else %}
-            <div class="text-muted p-3">Click "Run Forecast" to generate a forecast.</div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-{% endblock content %}
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'ts_dashboard/main.css' %}"> -->
+    <script src="{% static 'ts_dashboard/main.js' %}"></script>
+</body>
+</html>

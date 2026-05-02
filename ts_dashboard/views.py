@@ -179,4 +179,4 @@ def home(request):
         "form_end_date": end_date,
         "form_forecast": forecast_steps,
     }
-    return render(request, "ts_dashboard/base.html", context)
+    return render(request, "ts_dashboard/home.html", context)
