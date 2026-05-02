@@ -1,6 +1,5 @@
 {% extends "feed/base.html" %}
 {% load static %}
-
 {% block content %}
 <div class="container my-4">
 
@@ -34,6 +33,7 @@
     <!-- hidden action field -->
     <input type="hidden" name="action" id="action-input" value="">
 
+    <!-- Run (chart + stats only) -->
     <div class="col-12 col-md-1 d-grid">
       <button
         class="btn btn-primary"
@@ -43,12 +43,23 @@
       </button>
     </div>
 
+    <!-- Run Stationarity -->
     <div class="col-12 col-md-2 d-grid">
       <button
         class="btn btn-outline-secondary"
         type="submit"
         onclick="document.getElementById('action-input').value='stationarity'">
         Run Stationarity
+      </button>
+    </div>
+
+    <!-- Run Forecast -->
+    <div class="col-12 col-md-2 d-grid">
+      <button
+        class="btn btn-success"
+        type="submit"
+        onclick="document.getElementById('action-input').value='forecast'">
+        Run Forecast
       </button>
     </div>
 
@@ -97,7 +108,7 @@
                 {% for key, value in stats.items %}
                 <tr>
                   <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                  <td class="pe-3 text-end">{{ value  }}</td>
+                  <td class="pe-3 text-end">{{ value }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
@@ -111,9 +122,9 @@
         </div>
       </div>
 
-      <!-- Stationarity card (only shown after clicking Run Stationarity) -->
+      <!-- Stationarity card -->
       {% if stationarity %}
-      <div class="card shadow-sm">
+      <div class="card shadow-sm mb-3">
         <div class="card-header bg-white">
           <strong>Stationarity Test (ADF)</strong>
         </div>
@@ -121,6 +132,27 @@
           <table class="table table-sm mb-0">
             <tbody>
               {% for key, value in stationarity.items %}
+              <tr>
+                <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
+                <td class="pe-3 text-end">{{ value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Forecast metrics card -->
+      {% if forecast_metrics %}
+      <div class="card shadow-sm">
+        <div class="card-header bg-white">
+          <strong>Forecast Metrics</strong>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-sm mb-0">
+            <tbody>
+              {% for key, value in forecast_metrics.items %}
               <tr>
                 <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
                 <td class="pe-3 text-end">{{ value }}</td>
@@ -140,13 +172,13 @@
     <div class="col-12 col-lg-8">
       <div class="card shadow-sm">
         <div class="card-header bg-white">
-          <strong>Forecast</strong>
+          <strong>Forecast (Random Walk)</strong>
         </div>
         <div class="card-body">
           {% if forecast_chart_url %}
             <img class="img-fluid rounded" src="{{ forecast_chart_url }}" alt="Forecast chart for {{ symbol }}">
           {% else %}
-            <div class="text-muted p-3">Forecast chart not yet available.</div>
+            <div class="text-muted p-3">Click "Run Forecast" to generate a forecast.</div>
           {% endif %}
         </div>
       </div>
