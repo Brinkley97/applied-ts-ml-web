@@ -3,90 +3,121 @@
 {% block content %}
 <div class="container-fluid my-4 px-4">
 
-  <!-- FORM (same as home, so user can re-run) -->
-  <form method="get" action="{% url 'dashboard-forecast' %}" class="row g-3 align-items-end mb-4">
-    <div class="col-12 col-md-3">
-      <label class="form-label">Stock</label>
-      <select name="symbol" class="form-select">
-        <option value="MSFT" {% if form_symbol == "MSFT" %}selected{% endif %}>Microsoft (MSFT)</option>
-        <option value="INTC" {% if form_symbol == "INTC" %}selected{% endif %}>Intel (INTC)</option>
-        <option value="AAPL" {% if form_symbol == "AAPL" %}selected{% endif %}>Apple (AAPL)</option>
-      </select>
+    <!-- HEADER -->
+    <div class="d-flex align-items-center mb-3">
+    <div style="width: 33%;">
+        <a href="{% url 'dashboard-home' %}" class="btn btn-outline-secondary btn-sm">← Back to Home</a>
     </div>
-    <div class="col-12 col-md-3">
-      <label class="form-label">Start date</label>
-      <input type="date" name="start_date" class="form-control" value="{{ form_start_date }}">
+    <div style="width: 34%;" class="text-center">
+        <h1 class="h3 mb-0">Forecast Dashboard</h1>
+        <div class="text-muted">Symbol: <strong>{{ symbol }}</strong></div>
     </div>
-    <div class="col-12 col-md-3">
-      <label class="form-label">End date</label>
-      <input type="date" name="end_date" class="form-control" value="{{ form_end_date }}">
+    <div style="width: 33%;"></div>
     </div>
-    <div class="col-12 col-md-2">
-      <label class="form-label">Forecast (steps)</label>
-      <input type="number" name="forecast" class="form-control" min="1" value="{{ form_forecast }}">
-    </div>
-    <div class="col-12 col-md-1 d-grid">
-      <button class="btn btn-success" type="submit">Run Forecast</button>
-    </div>
-    <div class="col-12 col-md-1 d-grid">
-      <a class="btn btn-outline-secondary" href="{% url 'dashboard-home' %}">← Back</a>
-    </div>
-  </form>
-
-  <!-- HEADER -->
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-      <h1 class="h3 mb-0">Forecast Dashboard</h1>
-      <div class="text-muted">Symbol: <strong>{{ symbol }}</strong></div>
-    </div>
-    <div class="text-muted small">Auto-generated forecast</div>
-  </div>
 
   <!-- MAIN ROW: 3 - 6 - 3 -->
   <div class="row g-3">
 
-    <!-- LEFT (3/12): Select Model -->
+    <!-- LEFT (3/12): Control Panel + News + Stats + Models + Forecast Metrics -->
     <div class="col-lg-3">
-        <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white"><strong>Relevant Material</strong></div>
-            <div class="card-body p-0">
-            <ul>
-                <li><a href="https://www.google.com" target="_blank">Google</a></li>
-                <li><a href="https://www.wikipedia.org" target="_blank">Wikipedia</a></li>
-                <li><a href="https://www.github.com" target="_blank">GitHub</a></li>
-                <li><a href="https://www.stackoverflow.com" target="_blank">Stack Overflow</a></li>
-            </ul>
+
+      <!-- Control Panel -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>⚙️ Control Panel</strong></div>
+        <div class="card-body">
+          <form method="get" action="{% url 'dashboard-forecast' %}">
+            <div class="mb-2">
+              <label class="form-label small">Stock</label>
+              <select name="symbol" class="form-select form-select-sm">
+                <option value="MSFT" {% if form_symbol == "MSFT" %}selected{% endif %}>Microsoft (MSFT)</option>
+                <option value="INTC" {% if form_symbol == "INTC" %}selected{% endif %}>Intel (INTC)</option>
+                <option value="AAPL" {% if form_symbol == "AAPL" %}selected{% endif %}>Apple (AAPL)</option>
+              </select>
             </div>
-        </div>
-        <div class="card shadow-sm mb-3">
-            <div class="card-header bg-white"><strong>Select Model</strong></div>
-            <div class="card-body">
-            <div class="form-check">
+            <div class="mb-2">
+              <label class="form-label small">Start Date</label>
+              <input type="date" name="start_date" class="form-control form-control-sm" value="{{ form_start_date }}">
+            </div>
+            <div class="mb-2">
+              <label class="form-label small">End Date</label>
+              <input type="date" name="end_date" class="form-control form-control-sm" value="{{ form_end_date }}">
+            </div>
+            <div class="mb-3">
+              <label class="form-label small">Forecast Steps</label>
+              <input type="number" name="forecast" class="form-control form-control-sm" min="1" value="{{ form_forecast }}">
+            </div>
+
+            <!-- Model Selection -->
+            <div class="mb-3">
+              <label class="form-label small"><strong>Select Model</strong></label>
+              <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="rw" name="model" value="random_walk" checked>
-                <label class="form-check-label" for="rw">Random Walk</label>
-            </div>
-            <div class="form-check">
+                <label class="form-check-label small" for="rw">Random Walk</label>
+              </div>
+              <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="ar" name="model" value="autoregressive">
-                <label class="form-check-label" for="ar">AutoRegressive</label>
+                <label class="form-check-label small" for="ar">AutoRegressive</label>
+              </div>
             </div>
+
+            <div class="d-grid gap-2">
+              <button class="btn btn-success btn-sm" type="submit">
+                Run Forecast
+              </button>
             </div>
-            <div class="card-footer bg-white text-muted small">
-            Tip: use <code>1d</code> frequency if hourly data is slow or empty.
-            </div>
+          </form>
         </div>
+      </div>
+
+      <!-- Relevant Material -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>📰 Relevant Material</strong></div>
+        <div class="card-body p-0">
+          <ul class="mb-0 ps-3 py-2">
+            <li><a href="https://www.google.com" target="_blank">Google</a></li>
+            <li><a href="https://www.wikipedia.org" target="_blank">Wikipedia</a></li>
+            <li><a href="https://www.github.com" target="_blank">GitHub</a></li>
+            <li><a href="https://www.stackoverflow.com" target="_blank">Stack Overflow</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Summary Stats -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-header bg-white"><strong>📊 Summary Stats</strong></div>
+        <div class="card-body p-0">
+          {% if stats %}
+            <table class="table table-sm mb-0">
+              <tbody>
+                {% for key, value in stats.items %}
+                <tr>
+                  <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
+                  <td class="pe-3 text-end">{{ value }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="p-3 text-muted">No stats yet. Click Run Forecast.</div>
+          {% endif %}
+        </div>
+        <div class="card-footer bg-white text-muted small">
+          Tip: use <code>1d</code> frequency if hourly data is slow or empty.
+        </div>
+      </div>
     </div>
 
-    <!-- MIDDLE (6/12): Charts -->
+    <!-- MIDDLE (6/12): Original + Forecast Charts -->
     <div class="col-lg-6">
 
       <!-- Original chart -->
       <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white"><strong>Original (No Forecast)</strong></div>
+        <div class="card-header bg-white"><strong>📉 Original (No Forecast)</strong></div>
         <div class="card-body">
           {% if chart_url %}
             <img class="img-fluid rounded" src="{{ chart_url }}" alt="Stock chart for {{ symbol }}">
           {% else %}
-            <div class="text-muted p-3">No chart available.</div>
+            <div class="text-muted p-3">No chart available. Click Run Forecast.</div>
           {% endif %}
         </div>
       </div>
@@ -105,17 +136,30 @@
 
     </div>
 
-    <!-- RIGHT (3/12): Stats + Stationarity + Forecast Metrics -->
+    <!-- RIGHT (3/12): Chat with LLM -->
     <div class="col-lg-3">
+      <div class="card shadow-sm">
+        <div class="card-header bg-white"><strong>💬 Chat with LLM</strong></div>
+        <div class="card-body">
+          <form action="/action_page.php">
+            <textarea name="llm_input" rows="6" class="form-control mb-2"
+              placeholder="Ask about this forecast..."></textarea>
+            <button type="submit" class="btn btn-primary w-100">Chat</button>
+          </form>
+          <p class="text-muted small mt-2">
+            Submit your question to the LLM backend.
+          </p>
+        </div>
+      </div>
 
-      <!-- Summary stats -->
-      <div class="card shadow-sm mb-3">
-        <div class="card-header bg-white"><strong>Summary Stats</strong></div>
+            <!-- Forecast Metrics -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-white"><strong>🎯 Forecast Metrics</strong></div>
         <div class="card-body p-0">
-          {% if stats %}
+          {% if forecast_metrics %}
             <table class="table table-sm mb-0">
               <tbody>
-                {% for key, value in stats.items %}
+                {% for key, value in forecast_metrics.items %}
                 <tr>
                   <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
                   <td class="pe-3 text-end">{{ value }}</td>
@@ -124,36 +168,12 @@
               </tbody>
             </table>
           {% else %}
-            <div class="p-3 text-muted">No stats available.</div>
+            <div class="p-3 text-muted">Click "Run Forecast" to see metrics.</div>
           {% endif %}
         </div>
       </div>
-
-      <!-- Forecast metrics -->
-      {% if forecast_metrics %}
-      <div class="card shadow-sm">
-        <div class="card-header bg-white"><strong>Forecast Metrics</strong></div>
-        <div class="card-body p-0">
-          <table class="table table-sm mb-0">
-            <tbody>
-              {% for key, value in forecast_metrics.items %}
-              <tr>
-                <th class="ps-3 text-muted" style="width: 60%;">{{ key }}</th>
-                <td class="pe-3 text-end">{{ value }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      {% else %}
-      <div class="card shadow-sm">
-        <div class="card-header bg-white"><strong>Forecast Metrics</strong></div>
-        <div class="card-body text-muted p-3">Click "Run Forecast" to see metrics.</div>
-      </div>
-      {% endif %}
-
     </div>
+
   </div>
 </div>
 {% endblock content %}
